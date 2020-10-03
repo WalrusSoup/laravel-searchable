@@ -3,7 +3,9 @@
 namespace Spatie\Searchable;
 
 use Illuminate\Foundation\Auth\User;
+use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Arr;
+use Spatie\Searchable\Exceptions\InvalidSearchAspectConfiguration;
 
 class Search
 {
@@ -54,6 +56,21 @@ class Search
         });
 
         return $this;
+    }
+
+    public function performWithPagination(string $query, int $currentPage = 0, int $pageSize = 50, ?User $user = null) : Paginator
+    {
+        if(count($this->getSearchAspects()) !== 1) {
+            throw InvalidSearchAspectConfiguration::paginationUnavailable(count($this->getSearchAspects()));
+        }
+
+        $searchResults = new SearchResultCollection();
+        collect($this->getSearchAspects())->each(function (SearchAspect $aspect) use ($pageSize, $currentPage, $user, $query, $searchResults) {
+            $aspect->limit($pageSize);
+            $aspect->offset($currentPage * $pageSize);
+            $searchResults->addResults($aspect->getType(), $aspect->getResults($query, $user));
+        });
+        return new Paginator($searchResults->toArray(), $pageSize, $currentPage);
     }
 
     public function search(string $query, ?User $user = null): SearchResultCollection

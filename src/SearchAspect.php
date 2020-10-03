@@ -9,6 +9,8 @@ abstract class SearchAspect
 {
     /** @var int */
     protected $limit;
+    protected $pageSize;
+    protected $offset;
 
     abstract public function getResults(string $term): Collection;
 
@@ -30,5 +32,15 @@ abstract class SearchAspect
     public function limit($limit) : void
     {
         $this->limit = $limit;
+    }
+
+    public function offset($offset) : void
+    {
+        $this->offset = $offset;
+    }
+
+    public function pageSize($pageSize) : void
+    {
+        $this->pageSize = $pageSize;
     }
 }

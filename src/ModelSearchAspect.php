@@ -109,6 +109,9 @@ class ModelSearchAspect extends SearchAspect
         if($this->limit) {
             $query->limit($this->limit);
         }
+        if($this->offset) {
+            $query->offset($this->offset);
+        }
 
         return $query->get();
     }
